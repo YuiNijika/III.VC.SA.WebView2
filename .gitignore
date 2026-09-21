@@ -1,0 +1,5 @@
+archives/
+build/
+tools/pack/
+archive/
+lib/Plugin*.lib
