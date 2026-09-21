@@ -67,9 +67,17 @@ void AdvanceBootstrap() {
     }
 
     s_drawCallbackId = XBase::Hooks::RegisterDrawCallback([]() {
-        if (s_pluginActive) {
-            Panel::Draw();
+        if (!s_pluginActive) {
+            return;
         }
+
+        // 面板占住焦点后游戏可能进入暂停，脚本事件停摆，热键只能在渲染回调里补
+        XBase::Input::PollSystemKeys();
+        if (s_hotkeyValid && XBase::Input::WasPressed(s_hotkey)) {
+            Panel::Toggle();
+        }
+
+        Panel::Draw();
     });
     if (!static_cast<bool>(s_drawCallbackId) || !XBase::Hooks::Init()) {
         if (s_drawCallbackId) {
