@@ -15,6 +15,12 @@ Out of scope:
 - No menu, cheats, teleport, or other game features; those belong to XMenu
 - No bundled web content; the page comes from the configured URL
 
+## The panel
+
+- The panel is a regular window with a title bar; the title reads `III.VC.SA.WebView2 | Author@鼠子(YuiNijika)` and the close button sits at the top right
+- `webview.hotkey` toggles the panel, and the hotkey keeps working while the game is paused because the plugin also polls it from the render callback
+- Closing the panel, by the close button or the hotkey, returns input and focus to the game
+
 ## Installation
 
 1. Install [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) (Widescreen Fix ships it as well)
@@ -33,6 +39,8 @@ GameRoot\
 
 Runtime requirement: Windows 10/11 ships the WebView2 runtime; when it is missing the panel never appears and the log records the reason.
 
+The first run writes `WebView2\config.json` next to the payload DLLs; the next section covers its keys.
+
 ## Supported games
 
 | Game | Version |
@@ -43,7 +51,7 @@ Runtime requirement: Windows 10/11 ships the WebView2 runtime; when it is missin
 
 ## Configuration
 
-After the first run the config lives at `XBase\config.json` next to the ASI. Changes apply after a game restart.
+After the first run the config lives at `WebView2\config.json` next to the payload DLLs. Changes apply after a game restart.
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
@@ -67,7 +75,7 @@ After the first run the config lives at `XBase\config.json` next to the ASI. Cha
 }
 ```
 
-Window mode notes: in exclusive fullscreen DWM does not compose the game window, so the panel can only be shown as a captured preview with a capped frame rate and no text input. Setting `windowMode` to `2` and restarting makes the game run as a borderless window, and the panel returns to native rendering.
+Window mode notes: in exclusive fullscreen DWM does not compose the game window, so the panel can only be shown as a captured preview with a capped frame rate and no text input. Setting `windowMode` to `2` and restarting makes the game run as a borderless window, and the panel returns to native rendering. The borderless window stays at normal window level, so other applications can still cover the game and the taskbar keeps its own layer.
 
 ## Build
 
@@ -93,7 +101,7 @@ build\bin\WebView2\WebView2Loader.dll
 | Path | Responsibility |
 |---|---|
 | `loader/LoaderAnchor.cpp` | Keeps one compile item so MSVC runs Link and pulls the XBase bootstrap entry with WHOLEARCHIVE; exports `XBasePayloadBaseName` to declare the payload base name |
-| `src/main.cpp` | Startup validation, config load, Host registration, hotkey toggle; exports `XBasePayloadAttach` / `XBasePayloadDetach` |
+| `src/main.cpp` | Startup validation, config load, Host registration, hotkey handling; exports `XBasePayloadAttach` / `XBasePayloadDetach` |
 | `src/Panel.cpp` | Panel window, viewport submission, captured-frame display and input forwarding, load failure handling |
 | `lib/` `include/` | SDK staged by the XBase build; never edit by hand |
 
@@ -117,6 +125,7 @@ OnProcess
 ├─ Core::Process    WebView domain: create, capture, cursor
 └─ Hooks::MaintainInputState
 Draw callback
+├─ Input::PollSystemKeys + hotkey toggle   keeps working while paused
 └─ Panel::Draw
    ├─ WebView::SetBounds
    ├─ WebView::DrawPanel          captured-frame mode only

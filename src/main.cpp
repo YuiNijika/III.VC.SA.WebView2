@@ -18,6 +18,7 @@ const char* PLUGIN_NAME = "III.VC.SA.WebView2";
 const char* PLUGIN_VERSION = "v0.0.1";
 constexpr const char* DefaultUrl = "https://gtamodx.com/";
 constexpr const char* DefaultHotkey = "F8";
+constexpr const char* ConfigFileName = "config.json";
 
 int s_bootstrapStage = -1;
 bool s_pluginActive = false;
@@ -31,6 +32,22 @@ XBase::Hooks::WindowMode ToEngineWindowMode(int mode) {
     case 2: return XBase::Hooks::WindowMode::Borderless;
     default: return XBase::Hooks::WindowMode::Fullscreen;
     }
+}
+
+// 配置文件与载荷同目录，首次运行写出默认值方便直接改
+void InitConfig() {
+    XBase::Config::Init(XBase::Platform::CurrentModuleDirectory() + ConfigFileName);
+    if (XBase::Config::HasKey("webview.url")) {
+        return;
+    }
+
+    XBase::Config::SetString("webview.url", DefaultUrl);
+    XBase::Config::SetString("webview.hotkey", DefaultHotkey);
+    XBase::Config::SetFloat("webview.zoom", 1.0f);
+    XBase::Config::SetFloat("webview.width", 1000.0f);
+    XBase::Config::SetFloat("webview.height", 640.0f);
+    XBase::Config::SetInt("webview.windowMode", 0);
+    XBase::Config::Save();
 }
 
 void LoadConfig() {
@@ -129,7 +146,7 @@ extern "C" void XBasePayloadAttach() {
     }
 
     // 网页面板需要 DWM 合成，窗口模式必须在游戏创建设备之前决定
-    XBase::Config::Init();
+    InitConfig();
     const int windowMode = XBase::Config::GetInt("webview.windowMode", 0);
     if (windowMode == 1 || windowMode == 2) {
         XBase::Hooks::PrepareStartupWindowMode(ToEngineWindowMode(windowMode));

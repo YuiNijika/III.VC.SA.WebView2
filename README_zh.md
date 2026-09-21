@@ -15,6 +15,12 @@
 - 不提供菜单、作弊、传送等游戏功能，这些属于 XMenu
 - 不内置网页内容，页面由配置里的地址决定
 
+## 面板
+
+- 面板是一个带标题栏的普通窗口，标题为 `III.VC.SA.WebView2 | Author@鼠子(YuiNijika)`，右上角是关闭按钮
+- `webview.hotkey` 开关面板；游戏暂停时热键依然有效，因为插件同时在渲染回调里轮询热键
+- 用关闭按钮或热键关掉面板后，输入与焦点都会交还游戏
+
 ## 安装
 
 1. 安装 [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases)（若已装 Widescreen Fix 则自带）
@@ -33,6 +39,8 @@
 
 运行时要求：Windows 10/11 自带 WebView2 运行时；缺失时面板不会出现，日志会记录原因。
 
+首次运行会在载荷目录生成 `WebView2\config.json`，字段见下一节。
+
 ## 支持的游戏
 
 | 游戏 | 版本 |
@@ -43,7 +51,7 @@
 
 ## 配置
 
-首次运行后配置文件位于 ASI 同目录的 `XBase\config.json`，改动后重启游戏生效。
+首次运行会在载荷目录生成 `WebView2\config.json`，改动后重启游戏生效。
 
 | 键 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
@@ -67,7 +75,7 @@
 }
 ```
 
-窗口模式说明：独占全屏时 DWM 不合成游戏窗口，面板只能以抓帧预览显示，帧率受限且不支持文字输入；把 `windowMode` 设为 `2` 并重启游戏后，游戏以无边框窗口运行，面板恢复原生渲染。
+窗口模式说明：独占全屏时 DWM 不合成游戏窗口，面板只能以抓帧预览显示，帧率受限且不支持文字输入；把 `windowMode` 设为 `2` 并重启游戏后，游戏以无边框窗口运行，面板恢复原生渲染。无边框窗口是普通层级，其他程序仍可覆盖游戏，任务栏也在其之上。
 
 ## 构建
 
@@ -93,7 +101,7 @@ build\bin\WebView2\WebView2Loader.dll
 | 路径 | 职责 |
 |---|---|
 | `loader/LoaderAnchor.cpp` | 只保留一个编译单元，让 MSVC 链接时用 WHOLEARCHIVE 拉入 XBase 的 bootstrap 入口；导出 `XBasePayloadBaseName` 声明载荷基名 |
-| `src/main.cpp` | 启动校验、配置读取、Host 注册、热键开关；导出 `XBasePayloadAttach` / `XBasePayloadDetach` |
+| `src/main.cpp` | 启动校验、配置读取、Host 注册、热键处理；导出 `XBasePayloadAttach` / `XBasePayloadDetach` |
 | `src/Panel.cpp` | 面板窗口、视口提交、抓帧回显与输入转发、加载失败处理 |
 | `lib/` `include/` | XBase 构建时暂存的 SDK，不要手工修改 |
 
@@ -117,6 +125,7 @@ OnProcess
 ├─ Core::Process    WebView 域创建/抓帧/光标
 └─ Hooks::MaintainInputState
 Draw 回调
+├─ Input::PollSystemKeys 与热键切换   暂停时依然生效
 └─ Panel::Draw
    ├─ WebView::SetBounds
    ├─ WebView::DrawPanel        仅抓帧模式
