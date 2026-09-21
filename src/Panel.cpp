@@ -5,6 +5,7 @@
 #include <XBase/Log.h>
 
 #include <algorithm>
+#include <cstdio>
 
 namespace {
     bool s_visible = false;
@@ -15,15 +16,18 @@ namespace {
     bool s_fullscreenNoticeShown = false;
 
     constexpr const char* kWindowId = "WebView2Panel";
-    constexpr const char* kTitle = "MOD Download";
+    constexpr const char* kTitle = "III.VC.SA.WebView2 | Author@鼠子(YuiNijika)";
+    // 视口取窗口内容区，标题栏与边框留给自己，网页不覆盖标题栏
+    XBase::Rect ViewportRect() {
+        const XBase::Vec2 origin = XBase::UI::GetCursorScreenPosition();
+        const XBase::Vec2 available = XBase::UI::GetContentAvailable();
+        const XBase::Rect windowRect = XBase::UI::GetCurrentWindowRect();
 
-    XBase::Rect ViewportRect(const XBase::Rect& windowRect) {
-        const float padding = 8.0f;
         XBase::Rect rect{};
-        rect.left = windowRect.left + padding;
-        rect.top = windowRect.top + padding;
-        rect.right = windowRect.right - padding;
-        rect.bottom = windowRect.bottom - padding;
+        rect.left = std::max(origin.x, windowRect.left);
+        rect.top = std::max(origin.y, windowRect.top);
+        rect.right = std::min(origin.x + available.x, windowRect.right);
+        rect.bottom = std::min(origin.y + available.y, windowRect.bottom);
         if (rect.right - rect.left < 24.0f || rect.bottom - rect.top < 24.0f) {
             rect.right = rect.left + 1.0f;
             rect.bottom = rect.top + 1.0f;
@@ -66,11 +70,12 @@ void Draw() {
 
     XBase::UI::SetNextWindowSize({s_width, s_height}, true);
     bool open = true;
-    XBase::UI::Window(kWindowId, kTitle, [&] {
-        const XBase::Rect windowRect = XBase::UI::GetCurrentWindowRect();
-        const XBase::Rect area = ViewportRect(windowRect);
+    // 标题里带 ### 固定窗口标识，标题文本变化不会重建窗口
+    char windowTitle[192]{};
+    std::snprintf(windowTitle, sizeof(windowTitle), "%s###%s", kTitle, kWindowId);
+    XBase::UI::Window(kWindowId, windowTitle, [&] {
+        const XBase::Rect area = ViewportRect();
         const XBase::Vec2 size{area.right - area.left, area.bottom - area.top};
-        XBase::UI::SetCursorScreenPos({area.left, area.top});
         XBase::UI::InvisibleButton("##WebArea", size);
 
         if (!s_visible) {
