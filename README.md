@@ -1,26 +1,28 @@
 # III.VC.SA.WebView2
 
-> 在 GTA III / Vice City / San Andreas 游戏内显示一个由系统 WebView2 渲染的网页面板，热键开关，页面地址与窗口模式由配置决定。
+> An in-game web panel for GTA III / Vice City / San Andreas, rendered by the system WebView2, toggled by a hotkey, with the page URL and window mode driven by config.
 
-## 这个项目做什么
+**English** | [简体中文](README_zh.md)
 
-- 游戏内显示网页：面板是一个独立窗口，页面由系统 WebView2 渲染，不依赖任何菜单
-- 独占全屏下改用抓帧贴图呈现，并提示切换到无边框窗口以获得原生速度与文字输入
-- 页面加载失败时给出重新加载入口
+## What this project does
 
-不属于本项目的内容：
+- Shows a web page inside the game: the panel is its own window, the page is rendered by the system WebView2, and no menu is involved
+- In exclusive fullscreen it switches to a captured preview and tells you to move to borderless windowed mode for native speed and text input
+- Shows a reload entry when the page fails to load
 
-- 不提供菜单、作弊、传送等游戏功能，这些属于 XMenu
-- 不内置网页内容，页面由配置里的地址决定
+Out of scope:
 
-## 安装
+- No menu, cheats, teleport, or other game features; those belong to XMenu
+- No bundled web content; the page comes from the configured URL
 
-1. 安装 [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases)（若已装 Widescreen Fix 则自带）
-2. 把 `III.VC.SA.WebView2.asi` 与同级的 `WebView2\` 目录一起放进游戏目录或 `scripts\` 目录
-3. 目录结构保持如下，载荷 DLL 与 `WebView2Loader.dll` 必须和 ASI 在同一层目录下
+## Installation
+
+1. Install [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) (Widescreen Fix ships it as well)
+2. Copy `III.VC.SA.WebView2.asi` together with the sibling `WebView2\` folder into the game root or the `scripts\` folder
+3. Keep the layout below; payload DLLs and `WebView2Loader.dll` must stay in the same folder as the ASI
 
 ```txt
-游戏目录\
+GameRoot\
 ├─ III.VC.SA.WebView2.asi
 └─ WebView2\
    ├─ WebView2III.dll
@@ -29,28 +31,28 @@
    └─ WebView2Loader.dll
 ```
 
-运行时要求：Windows 10/11 自带 WebView2 运行时；缺失时面板不会出现，日志会记录原因。
+Runtime requirement: Windows 10/11 ships the WebView2 runtime; when it is missing the panel never appears and the log records the reason.
 
-## 支持的游戏
+## Supported games
 
-| 游戏 | 版本 |
+| Game | Version |
 |---|---|
 | GTA III | 1.0 |
 | GTA Vice City | 1.0 |
 | GTA San Andreas | 1.0 US |
 
-## 配置
+## Configuration
 
-首次运行后配置文件位于 ASI 同目录的 `XBase\config.json`，改动后重启游戏生效。
+After the first run the config lives at `XBase\config.json` next to the ASI. Changes apply after a game restart.
 
-| 键 | 类型 | 默认值 | 说明 |
+| Key | Type | Default | Meaning |
 |---|---|---|---|
-| `webview.url` | string | `https://gtamodx.com/` | 面板加载的地址 |
-| `webview.hotkey` | string | `F8` | 开关面板的热键，写法见 `XBase::Input::ParseHotkey`，支持 `Ctrl+` / `Alt+` / `Shift+` 前缀 |
-| `webview.zoom` | number | `1.0` | 页面缩放，范围 0.5 到 2.0 |
-| `webview.width` | number | `1000` | 面板宽度，像素 |
-| `webview.height` | number | `640` | 面板高度，像素 |
-| `webview.windowMode` | number | `0` | `0` 独占全屏，`1` 窗口，`2` 无边框；窗口与无边框需要在游戏启动前决定，因此修改后重启游戏生效 |
+| `webview.url` | string | `https://gtamodx.com/` | Page loaded in the panel |
+| `webview.hotkey` | string | `F8` | Panel toggle hotkey; syntax follows `XBase::Input::ParseHotkey` and supports `Ctrl+` / `Alt+` / `Shift+` prefixes |
+| `webview.zoom` | number | `1.0` | Page zoom, 0.5 to 2.0 |
+| `webview.width` | number | `1000` | Panel width in pixels |
+| `webview.height` | number | `640` | Panel height in pixels |
+| `webview.windowMode` | number | `0` | `0` exclusive fullscreen, `1` windowed, `2` borderless; windowed and borderless must be chosen before the game creates its device, so restart after changing it |
 
 ```json
 {
@@ -65,18 +67,18 @@
 }
 ```
 
-窗口模式说明：独占全屏时 DWM 不合成游戏窗口，面板只能以抓帧预览显示，帧率受限且不支持文字输入；把 `windowMode` 设为 `2` 并重启游戏后，游戏以无边框窗口运行，面板恢复原生渲染。
+Window mode notes: in exclusive fullscreen DWM does not compose the game window, so the panel can only be shown as a captured preview with a capped frame rate and no text input. Setting `windowMode` to `2` and restarting makes the game run as a borderless window, and the panel returns to native rendering.
 
-## 构建
+## Build
 
-依赖 XBase SDK。先构建 XBase，它会把头文件与静态库暂存到本项目的 `include\XBase` 与 `lib`：
+Requires the XBase SDK. Build XBase first; it stages headers and static libraries into this project's `include\XBase` and `lib`:
 
 ```bash
 XBase\Build.bat Release --no-pause
 III.VC.SA.WebView2\Build.bat Release --no-pause
 ```
 
-产物：
+Outputs:
 
 ```txt
 build\bin\III.VC.SA.WebView2.asi
@@ -86,61 +88,61 @@ build\bin\WebView2\WebView2III.dll
 build\bin\WebView2\WebView2Loader.dll
 ```
 
-## 代码结构
+## Source layout
 
-| 路径 | 职责 |
+| Path | Responsibility |
 |---|---|
-| `loader/LoaderAnchor.cpp` | 只保留一个编译单元，让 MSVC 链接时用 WHOLEARCHIVE 拉入 XBase 的 bootstrap 入口；导出 `XBasePayloadBaseName` 声明载荷基名 |
-| `src/main.cpp` | 启动校验、配置读取、Host 注册、热键开关；导出 `XBasePayloadAttach` / `XBasePayloadDetach` |
-| `src/Panel.cpp` | 面板窗口、视口提交、抓帧回显与输入转发、加载失败处理 |
-| `lib/` `include/` | XBase 构建时暂存的 SDK，不要手工修改 |
+| `loader/LoaderAnchor.cpp` | Keeps one compile item so MSVC runs Link and pulls the XBase bootstrap entry with WHOLEARCHIVE; exports `XBasePayloadBaseName` to declare the payload base name |
+| `src/main.cpp` | Startup validation, config load, Host registration, hotkey toggle; exports `XBasePayloadAttach` / `XBasePayloadDetach` |
+| `src/Panel.cpp` | Panel window, viewport submission, captured-frame display and input forwarding, load failure handling |
+| `lib/` `include/` | SDK staged by the XBase build; never edit by hand |
 
-加载链路：
+Load chain:
 
 ```txt
 III.VC.SA.WebView2.asi
-└─ XBase Bootstrap 检测游戏版本
-   └─ 载入 WebView2\WebView2<游戏>.dll
+└─ XBase Bootstrap detects the game
+   └─ loads WebView2\WebView2<game>.dll
       └─ XBasePayloadAttach
          ├─ Runtime::ValidateEnvironment
-         ├─ Config::Init 并准备窗口模式
+         ├─ Config::Init and startup window mode
          └─ Host::Install
 ```
 
-面板每帧流程：
+Per-frame flow:
 
 ```txt
 OnProcess
-├─ Panel::Process   同步可见性、菜单关闭时隐藏
-├─ Core::Process    WebView 域创建/抓帧/光标
+├─ Panel::Process   sync visibility, hide when the menu closes
+├─ Core::Process    WebView domain: create, capture, cursor
 └─ Hooks::MaintainInputState
-Draw 回调
+Draw callback
 └─ Panel::Draw
    ├─ WebView::SetBounds
-   ├─ WebView::DrawPanel        仅抓帧模式
-   └─ WebView::ForwardPanelInput 仅抓帧模式
+   ├─ WebView::DrawPanel          captured-frame mode only
+   └─ WebView::ForwardPanelInput  captured-frame mode only
 ```
 
-## 与 XBase 的关系
+## Relation to XBase
 
-本项目不包含任何游戏地址，全部能力来自 XBase 公共 API：
+This project contains no game addresses; every capability comes from the XBase public API:
 
-| 用途 | 入口 |
+| Purpose | Entry |
 |---|---|
-| 生命周期 | `XBase::Host::Install`、`XBase::Core::Init/Process/Shutdown` |
-| 渲染与输入 | `XBase::Hooks::RegisterDrawCallback`、`MaintainInputState`、`SetMenuVisible` |
-| 窗口模式 | `XBase::Hooks::PrepareStartupWindowMode` |
-| 网页视图 | `XBase::WebView::Init/Navigate/SetVisible/SetBounds/DrawPanel/ForwardPanelInput` |
-| 界面与配置 | `XBase::UI`、`XBase::Config`、`XBase::Input` |
+| Lifecycle | `XBase::Host::Install`, `XBase::Core::Init/Process/Shutdown` |
+| Rendering and input | `XBase::Hooks::RegisterDrawCallback`, `MaintainInputState`, `SetMenuVisible` |
+| Window mode | `XBase::Hooks::PrepareStartupWindowMode` |
+| Web view | `XBase::WebView::Init/Navigate/SetVisible/SetBounds/DrawPanel/ForwardPanelInput` |
+| UI and config | `XBase::UI`, `XBase::Config`, `XBase::Input` |
 
-完整 API、能力矩阵与边界说明见 XBase 文档：<https://gtadev.miomoe.cn/docs/xbase/>
+Full API, capability matrix, and boundaries: <https://gtadev.miomoe.cn/docs/xbase/>
 
-## 排查路径
+## Troubleshooting
 
-1. 游戏目录下确认 `III.VC.SA.WebView2.asi` 与 `WebView2\` 同级存在，且载荷 DLL 名与游戏匹配
-2. 查看 `XBase\logs\xbase.log`，正常启动应出现 `WebView2: Host 注册通过` 与 `WebView2: 渲染后端就绪`
-3. 提示 `Failed to detect supported GTA runtime` 表示游戏版本不在支持列表
-4. 提示找不到载荷文件时，按日志里的期望路径核对目录与文件名
-5. 面板出现但没有画面：确认 `WebView2Loader.dll` 在载荷目录内，且系统已安装 WebView2 运行时
-6. 面板帧率低或不支持文字输入：当前是独占全屏抓帧预览，按配置章节切换到无边框窗口模式
-7. 热键无效：确认 `webview.hotkey` 写法正确，日志会记录解析失败并回退到默认值
+1. Confirm `III.VC.SA.WebView2.asi` and the sibling `WebView2\` folder exist in the game root, and that the payload DLL matches the game
+2. Check `XBase\logs\xbase.log`; a healthy start logs `WebView2: Host 注册通过` and `WebView2: 渲染后端就绪`
+3. `Failed to detect supported GTA runtime` means the game version is not supported
+4. When the payload file is missing, compare the expected path printed in the log with the real folder and file names
+5. Panel appears but stays blank: verify `WebView2Loader.dll` sits in the payload folder and the WebView2 runtime is installed
+6. Low frame rate or no text input: the panel is in exclusive-fullscreen captured preview; switch to borderless windowed mode as described above
+7. Hotkey does nothing: check the `webview.hotkey` syntax; the log records a parse failure and falls back to the default
