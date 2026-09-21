@@ -5,11 +5,9 @@
 #include <XBase/Log.h>
 
 #include <algorithm>
-#include <cstdio>
 
 namespace {
     bool s_visible = false;
-    bool s_requested = false;
     std::string s_url = "https://gtamodx.com/";
     float s_zoom = 1.0f;
     float s_width = 1000.0f;
@@ -69,7 +67,6 @@ void Draw() {
     XBase::UI::SetNextWindowSize({s_width, s_height}, true);
     bool open = true;
     XBase::UI::Window(kWindowId, kTitle, [&] {
-        XBase::UI::TextDisabled("Borderless mode gives a smooth, interactive page; Settings are not required for this plugin.");
         const XBase::Rect windowRect = XBase::UI::GetCurrentWindowRect();
         const XBase::Rect area = ViewportRect(windowRect);
         const XBase::Vec2 size{area.right - area.left, area.bottom - area.top};

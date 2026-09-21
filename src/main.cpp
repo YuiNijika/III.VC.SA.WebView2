@@ -15,7 +15,7 @@
 namespace {
 
 const char* PLUGIN_NAME = "III.VC.SA.WebView2";
-const char* PLUGIN_VERSION = "v0.1.0-alpha1";
+const char* PLUGIN_VERSION = "v0.0.1";
 constexpr const char* DefaultUrl = "https://gtamodx.com/";
 constexpr const char* DefaultHotkey = "F8";
 

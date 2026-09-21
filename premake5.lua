@@ -34,7 +34,7 @@ function configureBuildMode()
     filter {}
 end
 
--- 载荷命名与宿主 ASI 名解耦，loader 导出基名 WebView2，
+-- 载荷命名与宿主 ASI 名解耦，loader 导出基名 WebView2
 -- 主 ASI 仍叫 III.VC.SA.WebView2.asi，载荷是 WebView2\WebView2SA.dll
 local PAYLOAD_BASE = "WebView2"
 
