@@ -6,6 +6,7 @@
 #include <XBase/Log.h>
 #include <XBase/Platform.h>
 #include <XBase/Runtime.h>
+#include <XBase/WebBridge.h>
 #include <XBase/WebView.h>
 
 #include "Panel.h"
@@ -36,7 +37,7 @@ XBase::Hooks::WindowMode ToEngineWindowMode(int mode) {
 
 // 配置文件与载荷同目录，首次运行写出默认值方便直接改
 void InitConfig() {
-    XBase::Config::Init(XBase::Platform::CurrentModuleDirectory() + ConfigFileName);
+    XBase::Config::InitForMod("WebView2");
     if (XBase::Config::HasKey("webview.url")) {
         return;
     }
@@ -136,7 +137,7 @@ void OnProcess() {
 } // namespace
 
 extern "C" void XBasePayloadAttach() {
-    XBase::Log::Init();
+    XBase::Log::InitForMod("WebView2");
     XBase::Log::Info("WebView2: 载荷已加载，开始启动校验");
 
     const XBase::Runtime::ValidationResult validation = XBase::Runtime::ValidateEnvironment();
@@ -157,6 +158,9 @@ extern "C" void XBasePayloadAttach() {
         return;
     }
 
+    // 网页可以直接调用 XBase 公共 API，前端框架因此可以替代 ImGui 写界面
+    XBase::WebBridge::Install();
+
     s_bootstrapStage = 0;
     XBase::Log::Info("WebView2: Host 注册通过");
 }
@@ -167,6 +171,7 @@ extern "C" void XBasePayloadDetach() {
         s_drawCallbackId = {};
     }
     Panel::SetVisible(false);
+    XBase::WebBridge::Shutdown();
     XBase::Host::Shutdown();
     XBase::Core::Shutdown();
     XBase::Hooks::Shutdown();

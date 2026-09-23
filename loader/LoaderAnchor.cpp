@@ -3,7 +3,7 @@
 extern "C" void WebView2LoaderAnchor() {
 }
 
-// XBase bootstrap 用它决定载荷目录与文件名，主 ASI 自身仍叫 III.VC.SA.WebView2.asi
-extern "C" const char* XBasePayloadBaseName() {
+// XBase bootstrap 用它决定载荷目录与文件名：<游戏根目录>\XBase\Mods\WebView2\WebView2<游戏>.dll
+extern "C" __declspec(dllexport) const char* XBasePayloadBaseName() {
     return "WebView2";
 }

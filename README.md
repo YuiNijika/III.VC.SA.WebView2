@@ -24,22 +24,24 @@ Out of scope:
 ## Installation
 
 1. Install [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) (Widescreen Fix ships it as well)
-2. Copy `III.VC.SA.WebView2.asi` together with the sibling `WebView2\` folder into the game root or the `scripts\` folder
-3. Keep the layout below; payload DLLs and `WebView2Loader.dll` must stay in the same folder as the ASI
+2. Copy `WebView2.asi` into the game root or the `scripts\` folder; payload and config live under `<game root>\XBase\Mods\WebView2\`r
+3. Keep the layout below; the payload sits under `Mods\WebView2` and the loader next to the XBase data
 
 ```txt
 GameRoot\
-├─ III.VC.SA.WebView2.asi
-└─ WebView2\
-   ├─ WebView2III.dll
-   ├─ WebView2VC.dll
-   ├─ WebView2SA.dll
-   └─ WebView2Loader.dll
+├─ WebView2.asi
+└─ XBase\
+   ├─ debug.log
+   ├─ WebView2Loader.dll
+   └─ Mods\WebView2\
+      ├─ WebView2SA.dll / WebView2VC.dll / WebView2III.dll
+      ├─ config.json
+      └─ debug.log
 ```
 
 Runtime requirement: Windows 10/11 ships the WebView2 runtime; when it is missing the panel never appears and the log records the reason.
 
-The first run writes `WebView2\config.json` next to the payload DLLs; the next section covers its keys.
+The first run writes `<game root>\XBase\Mods\WebView2\config.json`; the next section covers its keys.
 
 ## Supported games
 
@@ -51,7 +53,7 @@ The first run writes `WebView2\config.json` next to the payload DLLs; the next s
 
 ## Configuration
 
-After the first run the config lives at `WebView2\config.json` next to the payload DLLs. Changes apply after a game restart.
+After the first run the config lives at `<game root>\XBase\Mods\WebView2\config.json`. Changes apply after a game restart.
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
@@ -89,11 +91,11 @@ III.VC.SA.WebView2\Build.bat Release --no-pause
 Outputs:
 
 ```txt
-build\bin\III.VC.SA.WebView2.asi
-build\bin\WebView2\WebView2SA.dll
-build\bin\WebView2\WebView2VC.dll
-build\bin\WebView2\WebView2III.dll
-build\bin\WebView2\WebView2Loader.dll
+build\bin\WebView2.asi
+build\bin\XBase\Mods\WebView2\WebView2SA.dll
+build\bin\XBase\Mods\WebView2\WebView2VC.dll
+build\bin\XBase\Mods\WebView2\WebView2III.dll
+XBase\lib\WebView2Loader.dll (shipped to <game root>\XBase\ by the XBase build)
 ```
 
 ## Source layout
@@ -108,9 +110,9 @@ build\bin\WebView2\WebView2Loader.dll
 Load chain:
 
 ```txt
-III.VC.SA.WebView2.asi
+WebView2.asi
 └─ XBase Bootstrap detects the game
-   └─ loads WebView2\WebView2<game>.dll
+   └─ loads XBase\Mods\WebView2\WebView2<game>.dll
       └─ XBasePayloadAttach
          ├─ Runtime::ValidateEnvironment
          ├─ Config::Init and startup window mode
@@ -144,14 +146,14 @@ This project contains no game addresses; every capability comes from the XBase p
 | Web view | `XBase::WebView::Init/Navigate/SetVisible/SetBounds/DrawPanel/ForwardPanelInput` |
 | UI and config | `XBase::UI`, `XBase::Config`, `XBase::Input` |
 
-Full API, capability matrix, and boundaries: <https://gtadev.miomoe.cn/docs/xbase/>
+Full API, capability matrix, and boundaries: <https://blog.miomoe.cn/docs/xbase/>
 
 ## Troubleshooting
 
-1. Confirm `III.VC.SA.WebView2.asi` and the sibling `WebView2\` folder exist in the game root, and that the payload DLL matches the game
-2. Check `XBase\logs\xbase.log`; a healthy start logs `WebView2: Host 注册通过` and `WebView2: 渲染后端就绪`
+1. Confirm `WebView2.asi` exists and `<game root>\XBase\Mods\WebView2\` holds the payload DLL matches the game
+2. Check `<game root>\XBase\Mods\WebView2\debug.log`; a healthy start logs `WebView2: Host 注册通过` and `WebView2: 渲染后端就绪`
 3. `Failed to detect supported GTA runtime` means the game version is not supported
 4. When the payload file is missing, compare the expected path printed in the log with the real folder and file names
-5. Panel appears but stays blank: verify `WebView2Loader.dll` sits in the payload folder and the WebView2 runtime is installed
+5. Panel appears but stays blank: verify `<game root>\XBase\WebView2Loader.dll` exists and the WebView2 runtime is installed
 6. Low frame rate or no text input: the panel is in exclusive-fullscreen captured preview; switch to borderless windowed mode as described above
 7. Hotkey does nothing: check the `webview.hotkey` syntax; the log records a parse failure and falls back to the default

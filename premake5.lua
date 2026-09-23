@@ -47,7 +47,7 @@ function createPayloadProject(projectID)
         kind "SharedLib"
         targetname (PAYLOAD_BASE .. upperID)
         targetextension ".dll"
-        targetdir ("build/bin/" .. PAYLOAD_BASE)
+        targetdir "build/bin/XBase/Mods/WebView2"
 
         includedirs {
             "include",

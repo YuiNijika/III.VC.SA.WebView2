@@ -13,6 +13,7 @@ void Process();
 void Draw();
 
 void Toggle();
+void ClosePanel();
 void SetVisible(bool visible);
 bool IsVisible();
 

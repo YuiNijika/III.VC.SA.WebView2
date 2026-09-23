@@ -74,6 +74,19 @@ void Draw() {
     char windowTitle[192]{};
     std::snprintf(windowTitle, sizeof(windowTitle), "%s###%s", kTitle, kWindowId);
     XBase::UI::Window(kWindowId, windowTitle, [&] {
+        // ???????????????????????????
+        if (XBase::UI::Button("Hide", {92.0f, 28.0f})) {
+            SetVisible(false);
+            return;
+        }
+        XBase::UI::SameLine();
+        if (XBase::UI::Button("Close", {92.0f, 28.0f})) {
+            ClosePanel();
+            return;
+        }
+        XBase::UI::SameLine();
+        XBase::UI::TextDisabled("Close releases the browser, Hide keeps it ready");
+
         const XBase::Rect area = ViewportRect();
         const XBase::Vec2 size{area.right - area.left, area.bottom - area.top};
         XBase::UI::InvisibleButton("##WebArea", size);
@@ -108,6 +121,13 @@ void Draw() {
 
 void Toggle() {
     SetVisible(!s_visible);
+}
+
+void ClosePanel() {
+    XBase::WebView::Close();
+    s_visible = false;
+    XBase::Hooks::SetMenuVisible(false);
+    s_fullscreenNoticeShown = false;
 }
 
 void SetVisible(bool visible) {

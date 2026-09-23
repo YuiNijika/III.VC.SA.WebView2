@@ -139,7 +139,7 @@ if errorlevel 1 (
 
 set "MSBUILD_PROPS=/p:Configuration=%CONFIG% /p:Platform=Win32 /p:PlatformToolset=!PLATFORM_TOOLSET! /verbosity:minimal"
 
-echo Building loader build\bin\III.VC.SA.WebView2.asi...
+echo Building loader build\bin\WebView2.asi...
 "!MSBUILD_EXE!" "build\WebView2.sln" /m /t:WebView2 !MSBUILD_PROPS!
 if errorlevel 1 (
     echo.
@@ -147,7 +147,7 @@ if errorlevel 1 (
     goto fail
 )
 
-echo Building payload build\bin\WebView2\WebView2SA.dll...
+echo Building payload build\bin\XBase\Mods\WebView2\WebView2SA.dll...
 "!MSBUILD_EXE!" "build\WebView2.sln" /m /t:WebView2PayloadSA !MSBUILD_PROPS!
 if errorlevel 1 (
     echo.
@@ -155,7 +155,7 @@ if errorlevel 1 (
     goto fail
 )
 
-echo Building payload build\bin\WebView2\WebView2VC.dll...
+echo Building payload build\bin\XBase\Mods\WebView2\WebView2VC.dll...
 "!MSBUILD_EXE!" "build\WebView2.sln" /m /t:WebView2PayloadVC !MSBUILD_PROPS!
 if errorlevel 1 (
     echo.
@@ -163,7 +163,7 @@ if errorlevel 1 (
     goto fail
 )
 
-echo Building payload build\bin\WebView2\WebView2III.dll...
+echo Building payload build\bin\XBase\Mods\WebView2\WebView2III.dll...
 "!MSBUILD_EXE!" "build\WebView2.sln" /m /t:WebView2PayloadIII !MSBUILD_PROPS!
 if errorlevel 1 (
     echo.
@@ -171,20 +171,20 @@ if errorlevel 1 (
     goto fail
 )
 
-if not exist "build\bin\III.VC.SA.WebView2.asi" (
-    echo [Error] build\bin\III.VC.SA.WebView2.asi was not produced.
+if not exist "build\bin\WebView2.asi" (
+    echo [Error] build\bin\WebView2.asi was not produced.
     goto fail
 )
-if not exist "build\bin\WebView2\WebView2SA.dll" (
-    echo [Error] build\bin\WebView2\WebView2SA.dll was not produced.
+if not exist "build\bin\XBase\Mods\WebView2\WebView2SA.dll" (
+    echo [Error] build\bin\XBase\Mods\WebView2\WebView2SA.dll was not produced.
     goto fail
 )
-if not exist "build\bin\WebView2\WebView2VC.dll" (
-    echo [Error] build\bin\WebView2\WebView2VC.dll was not produced.
+if not exist "build\bin\XBase\Mods\WebView2\WebView2VC.dll" (
+    echo [Error] build\bin\XBase\Mods\WebView2\WebView2VC.dll was not produced.
     goto fail
 )
-if not exist "build\bin\WebView2\WebView2III.dll" (
-    echo [Error] build\bin\WebView2\WebView2III.dll was not produced.
+if not exist "build\bin\XBase\Mods\WebView2\WebView2III.dll" (
+    echo [Error] build\bin\XBase\Mods\WebView2\WebView2III.dll was not produced.
     goto fail
 )
 
@@ -194,10 +194,10 @@ if errorlevel 1 goto fail
 echo.
 echo Build completed successfully.
 echo Output files:
-echo   build\bin\III.VC.SA.WebView2.asi
-echo   build\bin\WebView2\WebView2SA.dll
-echo   build\bin\WebView2\WebView2VC.dll
-echo   build\bin\WebView2\WebView2III.dll
+echo   build\bin\WebView2.asi
+echo   build\bin\XBase\Mods\WebView2\WebView2SA.dll
+echo   build\bin\XBase\Mods\WebView2\WebView2VC.dll
+echo   build\bin\XBase\Mods\WebView2\WebView2III.dll
 echo.
 goto success
 
@@ -253,6 +253,7 @@ for %%G in (SA VC III) do (
         exit /b 1
     )
 )
+
 exit /b 0
 
 rem ============================================================
@@ -443,15 +444,6 @@ if errorlevel 1 (
 exit /b 0
 
 :stage_data
-if exist "lib\WebView2Loader.dll" (
-    copy /Y "lib\WebView2Loader.dll" "build\bin\WebView2\WebView2Loader.dll" >nul
-    if errorlevel 1 (
-        echo [Error] Failed to stage WebView2Loader.dll.
-        exit /b 1
-    )
-) else (
-    echo [Warning] lib\WebView2Loader.dll not found; WebView feature will be unavailable.
-)
 exit /b 0
 
 :success

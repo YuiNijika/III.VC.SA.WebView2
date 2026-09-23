@@ -24,22 +24,24 @@
 ## 安装
 
 1. 安装 [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases)（若已装 Widescreen Fix 则自带）
-2. 把 `III.VC.SA.WebView2.asi` 与同级的 `WebView2\` 目录一起放进游戏目录或 `scripts\` 目录
-3. 目录结构保持如下，载荷 DLL 与 `WebView2Loader.dll` 必须和 ASI 在同一层目录下
+2. 把 `WebView2.asi` 放进游戏目录或 `scripts\` 目录，载荷与配置由 XBase 统一放在 `<游戏根目录>\XBase\Mods\WebView2\`
+3. 目录结构保持如下，载荷在 `Mods\WebView2` 下，加载器与 XBase 数据同级
 
 ```txt
 游戏目录\
-├─ III.VC.SA.WebView2.asi
-└─ WebView2\
-   ├─ WebView2III.dll
-   ├─ WebView2VC.dll
-   ├─ WebView2SA.dll
-   └─ WebView2Loader.dll
+├─ WebView2.asi
+└─ XBase\
+   ├─ debug.log
+   ├─ WebView2Loader.dll
+   └─ Mods\WebView2\
+      ├─ WebView2SA.dll / WebView2VC.dll / WebView2III.dll
+      ├─ config.json
+      └─ debug.log
 ```
 
 运行时要求：Windows 10/11 自带 WebView2 运行时；缺失时面板不会出现，日志会记录原因。
 
-首次运行会在载荷目录生成 `WebView2\config.json`，字段见下一节。
+首次运行会在 `<游戏根目录>\XBase\Mods\WebView2\config.json` 生成配置，字段见下一节。
 
 ## 支持的游戏
 
@@ -51,7 +53,7 @@
 
 ## 配置
 
-首次运行会在载荷目录生成 `WebView2\config.json`，改动后重启游戏生效。
+首次运行会在 `<游戏根目录>\XBase\Mods\WebView2\config.json` 生成配置，改动后重启游戏生效。
 
 | 键 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
@@ -89,11 +91,11 @@ III.VC.SA.WebView2\Build.bat Release --no-pause
 产物：
 
 ```txt
-build\bin\III.VC.SA.WebView2.asi
-build\bin\WebView2\WebView2SA.dll
-build\bin\WebView2\WebView2VC.dll
-build\bin\WebView2\WebView2III.dll
-build\bin\WebView2\WebView2Loader.dll
+build\bin\WebView2.asi
+build\bin\XBase\Mods\WebView2\WebView2SA.dll
+build\bin\XBase\Mods\WebView2\WebView2VC.dll
+build\bin\XBase\Mods\WebView2\WebView2III.dll
+XBase\lib\WebView2Loader.dll（由 XBase 构建统一分发到 <游戏根目录>\XBase\）
 ```
 
 ## 代码结构
@@ -108,9 +110,9 @@ build\bin\WebView2\WebView2Loader.dll
 加载链路：
 
 ```txt
-III.VC.SA.WebView2.asi
+WebView2.asi
 └─ XBase Bootstrap 检测游戏版本
-   └─ 载入 WebView2\WebView2<游戏>.dll
+   └─ 载入 XBase\Mods\WebView2\WebView2<游戏>.dll
       └─ XBasePayloadAttach
          ├─ Runtime::ValidateEnvironment
          ├─ Config::Init 并准备窗口模式
@@ -144,14 +146,14 @@ Draw 回调
 | 网页视图 | `XBase::WebView::Init/Navigate/SetVisible/SetBounds/DrawPanel/ForwardPanelInput` |
 | 界面与配置 | `XBase::UI`、`XBase::Config`、`XBase::Input` |
 
-完整 API、能力矩阵与边界说明见 XBase 文档：<https://gtadev.miomoe.cn/docs/xbase/>
+完整 API、能力矩阵与边界说明见 XBase 文档：<https://blog.miomoe.cn/docs/xbase/>
 
 ## 排查路径
 
-1. 游戏目录下确认 `III.VC.SA.WebView2.asi` 与 `WebView2\` 同级存在，且载荷 DLL 名与游戏匹配
-2. 查看 `XBase\logs\xbase.log`，正常启动应出现 `WebView2: Host 注册通过` 与 `WebView2: 渲染后端就绪`
+1. 游戏目录下确认 `WebView2.asi` 存在，且 `<游戏根目录>\XBase\Mods\WebView2\` 内有与游戏匹配的载荷 DLL
+2. 查看 `<游戏根目录>\XBase\Mods\WebView2\debug.log`，正常启动应出现 `WebView2: Host 注册通过` 与 `WebView2: 渲染后端就绪`
 3. 提示 `Failed to detect supported GTA runtime` 表示游戏版本不在支持列表
 4. 提示找不到载荷文件时，按日志里的期望路径核对目录与文件名
-5. 面板出现但没有画面：确认 `WebView2Loader.dll` 在载荷目录内，且系统已安装 WebView2 运行时
+5. 面板出现但没有画面：确认 `<游戏根目录>\XBase\WebView2Loader.dll` 存在，且系统已安装 WebView2 运行时
 6. 面板帧率低或不支持文字输入：当前是独占全屏抓帧预览，按配置章节切换到无边框窗口模式
 7. 热键无效：确认 `webview.hotkey` 写法正确，日志会记录解析失败并回退到默认值
